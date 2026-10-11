@@ -38,6 +38,19 @@ body { background: var(--paper); color: var(--ink); font-size: 13px; }
 .notification-button { position: relative; font-size: 18px; }
 .notification-button i { position: absolute; top: 3px; right: 5px; width: 6px; height: 6px; border: 1px solid white; border-radius: 50%; background: #e0524f; }
 .profile-button { gap: 8px; font-size: 11px; }
+.auth-controls { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+.auth-user { max-width: 180px; overflow: hidden; color: #52645a; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.auth-logout { padding: 6px 9px; border: 1px solid var(--line); border-radius: 6px; background: white; color: var(--green); cursor: pointer; font-size: 10px; font-weight: 700; }
+.auth-dialog { width: min(420px, calc(100vw - 28px)); padding: 0; border: 1px solid var(--line); border-radius: 10px; color: var(--ink); box-shadow: 0 20px 80px rgba(16, 48, 37, .22); }
+.auth-dialog::backdrop { background: rgba(10, 30, 22, .48); }
+.auth-dialog form { display: grid; gap: 14px; padding: 22px; }
+.auth-dialog .section-heading { align-items: flex-start; margin-bottom: 2px; }
+.auth-dialog .section-heading h2 { font-size: 19px; }
+.dialog-close { width: 28px; height: 28px; border: 1px solid var(--line); border-radius: 6px; background: white; color: var(--muted); cursor: pointer; font-size: 18px; }
+.auth-dialog > form > small { color: var(--muted); font-size: 10px; }
+.auth-hint { margin: -3px 0 10px; color: #62776a; font-size: 11px; }
+.auth-hint[hidden], .auth-controls [hidden] { display: none; }
+button:disabled, input:disabled, select:disabled { cursor: not-allowed; opacity: .58; }
 .profile-mark { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--green); color: white; font-family: Fraunces, serif; font-size: 9px; }
 .dashboard-hero-grid { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(230px, .85fr); gap: 10px; margin-bottom: 12px; }
 .hero-card { position: relative; min-height: 180px; overflow: hidden; display: flex; align-items: center; justify-content: space-between; padding: 22px 24px; border: 0; border-radius: 8px; background: linear-gradient(90deg, rgba(13, 62, 47, .98) 0%, rgba(13, 62, 47, .92) 48%, rgba(13, 62, 47, .12) 100%), url('https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=1200&q=85') center 48% / cover; color: #f6f8f5; }
@@ -165,6 +178,7 @@ input:focus, select:focus { outline: 2px solid #c4ddcb; border-color: var(--gree
   .search-box { grid-column: 1; grid-row: 2; }
   .notification-button { grid-column: 2; grid-row: 2; }
   .profile-button { grid-column: 3; grid-row: 2; }
+  .auth-controls { grid-column: 3; grid-row: 2; }
   .dashboard-hero-grid, .dashboard-lower-grid { grid-template-columns: 1fr; }
   .hero-card { min-height: 190px; }
   .hero-note { font-size: 9px; }

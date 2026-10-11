@@ -31,8 +31,9 @@
       <p class="today-label" id="currentDateLabel"></p>
       <label class="search-box"><span>⌕</span><input id="dashboardSearch" type="search" placeholder="Cari produk, bahan, atau menu..." aria-label="Cari produk atau bahan"></label>
       <button class="icon-button notification-button" type="button" aria-label="Notifikasi">♧<i></i></button>
-      <button class="profile-button" type="button"><span class="profile-mark">TK</span><span>Admin</span><span>⌄</span></button>
+      <div class="auth-controls"><button class="profile-button" id="loginButton" type="button"><span class="profile-mark">TK</span><span>Masuk</span></button><span class="auth-user" id="authUser" hidden></span><button class="auth-logout" id="logoutButton" type="button" hidden>Keluar</button></div>
     </header>
+    <dialog class="auth-dialog" id="authDialog"><form id="loginForm"><div class="section-heading"><div><p class="eyebrow">Akses staf</p><h2>Masuk ke Tentang Kita</h2></div><button class="dialog-close" id="closeAuthDialog" type="button" aria-label="Tutup">×</button></div><label>Email<input id="loginEmail" type="email" autocomplete="username" required></label><label>Kata sandi<input id="loginPassword" type="password" autocomplete="current-password" required></label><button class="primary-button" type="submit">Masuk <span>→</span></button><p class="form-message" id="authMessage" role="status"></p><small>Akun staf dibuat melalui Supabase Auth oleh administrator.</small></form></dialog>
 
     <section class="dashboard-hero-grid" aria-label="Dashboard utama">
       <div class="hero-card">
@@ -68,11 +69,13 @@
 
     <section id="pembelian" class="content-section workflow-section">
       <div class="section-heading"><div><p class="eyebrow">Input transaksi</p><h2>Pembelian baru</h2></div></div>
+      <p class="auth-hint" data-auth-hint>Masuk sebagai staf untuk mencatat atau mengubah data.</p>
       <div class="workflow-grid"><div class="panel"><form id="purchaseForm"><label>Supplier<select id="supplierId" required><option value="">Pilih supplier</option></select></label><label>Bahan baku<select id="materialId" required><option value="">Pilih bahan</option></select></label><div class="form-row"><label>Jumlah<input id="quantity" type="number" min="0.01" step="0.01" placeholder="0" required></label><label>Harga satuan<input id="unitCost" type="number" min="0" step="100" placeholder="0" required></label></div><label>Tanggal pembelian<input id="purchaseDate" type="date" required></label><button class="primary-button" type="submit">Simpan pembelian <span>→</span></button><p id="formMessage" class="form-message" role="status"></p></form></div></div>
     </section>
 
     <section class="content-section workflow-section" id="produk">
       <div class="section-heading"><div><p class="eyebrow">Produk</p><h2>Menu cafe</h2></div></div>
+      <p class="auth-hint" data-auth-hint>Masuk sebagai staf untuk mencatat atau mengubah data.</p>
       <div class="workflow-grid product-grid"><div class="panel"><form id="productForm"><label>Nama produk<input id="productName" type="text" placeholder="Contoh: Kopi Latte" required></label><label>Kategori<select id="productCategory"><option value="minuman">Minuman</option><option value="food">Food</option><option value="snack">Snack</option></select></label><label>Harga jual<input id="productPrice" type="number" min="0" step="100" placeholder="25000" required></label><label>Recipe<input type="hidden" id="productRecipe" value="[]"><div id="recipeContainer"></div><button type="button" id="addRecipeRow" class="secondary-button">+ Tambah bahan</button></label><button class="primary-button" type="submit">Simpan produk <span>→</span></button><p id="productMessage" class="form-message" role="status"></p></form></div><div class="panel product-list-panel"><div class="section-heading"><div><p class="eyebrow">Daftar</p><h2>Produk aktif</h2></div></div><div class="table-wrap"><table><thead><tr><th>Produk</th><th>Kategori</th><th>Harga</th><th>Recipe</th></tr></thead><tbody id="productsBody"><tr><td colspan="4" class="empty">Belum ada produk.</td></tr></tbody></table></div></div></div>
     </section>
   </main>
