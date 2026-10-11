@@ -57,15 +57,15 @@ alter table materials enable row level security;
 alter table products enable row level security;
 alter table purchases enable row level security;
 
--- Untuk aplikasi internal sederhana. Ganti policy dengan auth.uid() saat login ditambahkan.
-create policy "public read suppliers" on suppliers for select using (true);
-create policy "public write suppliers" on suppliers for insert with check (true);
-create policy "public read materials" on materials for select using (true);
-create policy "public write materials" on materials for all using (true) with check (true);
-create policy "public read products" on products for select using (true);
-create policy "public write products" on products for all using (true) with check (true);
-create policy "public read purchases" on purchases for select using (true);
-create policy "public write purchases" on purchases for insert with check (true);
+-- Data dapat dibaca publik; semua perubahan memerlukan akun Supabase Auth.
+create policy "public read suppliers" on suppliers for select to anon, authenticated using (true);
+create policy "authenticated write suppliers" on suppliers for all to authenticated using (true) with check (true);
+create policy "public read materials" on materials for select to anon, authenticated using (true);
+create policy "authenticated write materials" on materials for all to authenticated using (true) with check (true);
+create policy "public read products" on products for select to anon, authenticated using (true);
+create policy "authenticated write products" on products for all to authenticated using (true) with check (true);
+create policy "public read purchases" on purchases for select to anon, authenticated using (true);
+create policy "authenticated write purchases" on purchases for insert to authenticated with check (true);
 
 insert into suppliers (name, contact, is_pkp) values ('Supplier Bahan Baku Semarang', 'Semarang', false);
 insert into materials (name, unit, minimum_stock) values

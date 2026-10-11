@@ -24,11 +24,11 @@ const demo = {
   purchases: []
 };
 
-function send(res, status, body) { res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'Content-Type', 'Access-Control-Allow-Methods': 'GET,POST,DELETE,OPTIONS' }); res.end(JSON.stringify(body)); }
+function send(res, status, body) { res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'Content-Type,Authorization', 'Access-Control-Allow-Methods': 'GET,POST,DELETE,OPTIONS' }); res.end(JSON.stringify(body)); }
 async function supabase(table, options = {}) {
   if (!hasSupabase) return demo[table] || [];
   try {
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}${options.query || ''}`, { method: options.method || 'GET', headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', Prefer: options.method === 'POST' ? 'return=representation' : undefined }, body: options.body ? JSON.stringify(options.body) : undefined });
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}${options.query || ''}`, { method: options.method || 'GET', headers: { apikey: SUPABASE_KEY, Authorization: options.authorization || `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', Prefer: options.method === 'POST' ? 'return=representation' : undefined }, body: options.body ? JSON.stringify(options.body) : undefined });
     const text = await response.text();
     if (!response.ok) {
       const message = text || 'request failed';
@@ -62,16 +62,12 @@ async function route(req, res) {
   if (req.method === 'GET' && !url.pathname.startsWith('/api/') && serveFrontend(req, res, url.pathname)) return;
   try {
     if (req.method === 'GET' && url.pathname === '/api/materials') return send(res, 200, await supabase('materials', { query: '?select=*&order=name.asc' }));
-    if (req.method === 'DELETE' && url.pathname === '/api/materials') {
-      const body = await jsonBody(req);
-      if (!body.id) return send(res, 400, { error: 'ID wajib diisi.' });
-      const material = await supabase('materials', { query: `?id=eq.${encodeURIComponent(body.id)}` });
-      if (!material) return send(res, 404, { error: 'Bahan baku tidak ditemukan.' });
-      const nextLayers = material.fifo_layers;
-      const nextStock = nextLayers.reduce((sum, layer) => sum + Number(layer.quantity), 0);
-      const purchase = { supplier_id: body.supplier_id, purchase_date: body.purchase_date, total_amount: Number(body.quantity) * Number(body.unit_cost), items: [{ material_id: body.material_id, quantity: Number(body.quantity), unit_cost: Number(body.unit_cost) }], journal: [{ account: 'Persediaan Bahan Baku', debit: Number(body.quantity) * Number(body.unit_cost), credit: 0 }, { account: 'Hutang Supplier Non-PKP', debit: 0, credit: Number(body.quantity) * Number(body.unit_cost) }] };
-      if (hasSupabase) { await supabase('materials', { method: 'DELETE', query: `?id=eq.${encodeURIComponent(body.id)}` }); const saved = await supabase('purchases', { method: 'POST', body: purchase }); return send(res, 201, saved[0]); }
-      material.fifo_layers = nextLayers; material.current_stock = nextStock; demo.purchases.unshift({ id: `demo-${Date.now()}`, ...purchase }); return send(res, 201, demo.purchases[0]);
+    if (req.method === 'DELETE' && url.pathname.startsWith('/api/materials/')) {
+      const materialId = decodeURIComponent(url.pathname.slice('/api/materials/'.length));
+      if (!materialId) return send(res, 400, { error: 'ID bahan baku wajib diisi.' });
+      if (hasSupabase) await supabase('materials', { method: 'DELETE', query: `?id=eq.${encodeURIComponent(materialId)}`, authorization: req.headers.authorization });
+      else demo.materials = demo.materials.filter(item => item.id !== materialId);
+      return send(res, 200, { deleted: true, id: materialId });
     }
     if (req.method === 'GET' && url.pathname === '/api/suppliers') return send(res, 200, await supabase('suppliers', { query: '?select=*&order=name.asc' }));
     if (req.method === 'GET' && url.pathname === '/api/products') return send(res, 200, await supabase('products', { query: '?select=*&order=name.asc' }));
@@ -89,7 +85,7 @@ async function route(req, res) {
       if (!body.name || !body.selling_price || !Array.isArray(body.recipe)) return send(res, 400, { error: 'Nama produk, harga jual, dan recipe wajib diisi.' });
       const product = { name: body.name, category: body.category || 'minuman', selling_price: Number(body.selling_price), recipe: body.recipe, is_active: body.is_active !== false };
       if (hasSupabase) {
-        const saved = await supabase('products', { method: 'POST', body: product });
+        const saved = await supabase('products', { method: 'POST', body: product, authorization: req.headers.authorization });
         return send(res, 201, Array.isArray(saved) ? saved[0] : saved);
       }
       demo.products.unshift({ id: `product-${Date.now()}`, ...product });
@@ -104,7 +100,7 @@ async function route(req, res) {
       const nextLayers = fifoAdd(material.fifo_layers, body.quantity, body.unit_cost);
       const nextStock = nextLayers.reduce((sum, layer) => sum + Number(layer.quantity), 0);
       const purchase = { supplier_id: body.supplier_id, purchase_date: body.purchase_date, total_amount: Number(body.quantity) * Number(body.unit_cost), items: [{ material_id: body.material_id, quantity: Number(body.quantity), unit_cost: Number(body.unit_cost) }], journal: [{ account: 'Persediaan Bahan Baku', debit: Number(body.quantity) * Number(body.unit_cost), credit: 0 }, { account: 'Hutang Supplier Non-PKP', debit: 0, credit: Number(body.quantity) * Number(body.unit_cost) }] };
-      if (hasSupabase) { await supabase('materials', { method: 'PATCH', query: `?id=eq.${encodeURIComponent(body.material_id)}`, body: { fifo_layers: nextLayers, current_stock: nextStock, updated_at: new Date().toISOString() } }); const saved = await supabase('purchases', { method: 'POST', body: purchase }); return send(res, 201, saved[0]); }
+      if (hasSupabase) { await supabase('materials', { method: 'PATCH', query: `?id=eq.${encodeURIComponent(body.material_id)}`, body: { fifo_layers: nextLayers, current_stock: nextStock, updated_at: new Date().toISOString() }, authorization: req.headers.authorization }); const saved = await supabase('purchases', { method: 'POST', body: purchase, authorization: req.headers.authorization }); return send(res, 201, saved[0]); }
       material.fifo_layers = nextLayers; material.current_stock = nextStock; demo.purchases.unshift({ id: `demo-${Date.now()}`, ...purchase }); return send(res, 201, demo.purchases[0]);
     }
     send(res, 404, { error: 'Endpoint tidak ditemukan.' });
