@@ -35,6 +35,7 @@ async function refreshAuthSession() {
 }
 async function supabaseRequest(path, options = {}, retried = false) {
   const headers = { ...supabaseHeaders, ...(options.headers || {}), Authorization: `Bearer ${authSession?.access_token || SUPABASE_KEY}` };
+  if (options.method === 'POST' && !headers.Prefer) headers.Prefer = 'return=representation';
   const response = await fetch(`${SUPABASE_URL}/rest/v1${path}`, { ...options, headers });
   if (response.status === 401 && !retried && await refreshAuthSession()) return supabaseRequest(path, options, true);
   const data = response.status === 204 ? null : await response.json();
@@ -54,11 +55,11 @@ async function directRequest(path, options = {}) {
 		return { materials, purchases, products, inventoryValue: materials.reduce((total, material) => total + fifoValue(material), 0), lowStockCount: materials.filter(material => stockOf(material) <= Number(material.minimum_stock)).length };
 	}
 	if (path === '/suppliers') return supabaseRequest('/suppliers?select=*&order=name.asc', options);
-	if (path === '/products') return supabaseRequest('/products?select=*&order=name.asc', options);
+  if (path === '/products') return supabaseRequest(options.method === 'POST' ? '/products?select=*' : '/products?select=*&order=name.asc', options);
 	if (path === '/purchases') return supabaseRequest('/purchases?select=*&order=purchase_date.desc,created_at.desc&limit=10', options);
 	return supabaseRequest(path, options);
 }
-async function request(path, options = {}) { try { const headers = { ...(options.headers || {}) }; if (authSession?.access_token) headers.Authorization = `Bearer ${authSession.access_token}`; const response = await fetch(`${API_BASE}${path}`, { ...options, headers }); if (!response.ok) throw new Error('Backend belum aktif'); return await response.json(); } catch (error) { return directRequest(path, options); } }
+async function request(path, options = {}) { if (location.hostname.endsWith('.github.io')) return directRequest(path, options); try { const headers = { ...(options.headers || {}) }; if (authSession?.access_token) headers.Authorization = `Bearer ${authSession.access_token}`; const response = await fetch(`${API_BASE}${path}`, { ...options, headers }); if (!response.ok) throw new Error('Backend belum aktif'); return await response.json(); } catch (error) { return directRequest(path, options); } }
 function updateAuthUi() {
   const signedIn = Boolean(authSession?.access_token);
   const loginButton = document.querySelector('#loginButton');
