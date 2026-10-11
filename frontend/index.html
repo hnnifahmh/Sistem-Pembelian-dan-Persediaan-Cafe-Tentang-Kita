@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tentang Kita | Pembelian & Persediaan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="#ringkasan"><span class="brand-mark">TK</span><span><strong>Tentang Kita</strong><small>Cafe & Kitchen</small></span></a>
+    <nav aria-label="Navigasi utama">
+      <a class="active" href="#ringkasan"><span class="nav-icon">⌂</span>Ringkasan</a>
+      <a href="#persediaan"><span class="nav-icon">◇</span>Persediaan</a>
+      <a href="#pembelian"><span class="nav-icon">🛒</span>Pembelian</a>
+      <a href="#produk"><span class="nav-icon">♜</span>Produk</a>
+      <a href="#jurnal"><span class="nav-icon">▤</span>Jurnal</a>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="sidebar-note"><span class="status-dot"></span><span><b>Operasional aktif</b><small>Semarang · Satu lokasi</small></span></div>
+      <a class="settings-link" href="#ringkasan"><span>⚙</span>Pengaturan</a>
+    </div>
+  </aside>
+
+  <main class="main-content" id="ringkasan">
+    <header class="topbar">
+      <p class="today-label" id="currentDateLabel"></p>
+      <label class="search-box"><span>⌕</span><input id="dashboardSearch" type="search" placeholder="Cari produk, bahan, atau menu..." aria-label="Cari produk atau bahan"></label>
+      <button class="icon-button notification-button" type="button" aria-label="Notifikasi">♧<i></i></button>
+      <button class="profile-button" type="button"><span class="profile-mark">TK</span><span>Admin</span><span>⌄</span></button>
+    </header>
+
+    <section class="dashboard-hero-grid" aria-label="Dashboard utama">
+      <div class="hero-card">
+        <div class="hero-copy-block"><p class="eyebrow light">Pusat kendali stok</p><h1>Selamat pagi,<br><span>Tentang Kita.</span></h1><p>Kelola bahan baku, pembelian, dan harga pokok dengan alur FIFO yang rapi.</p><a href="#persediaan" class="hero-link">Lihat persediaan <span>→</span></a></div>
+        <div class="hero-note">Rasa enak<br>berawal dari<br>pengelolaan yang baik</div>
+      </div>
+      <div class="quick-card">
+        <div class="section-heading"><div><p class="eyebrow">Aksi cepat</p><h2>Aksi Cepat</h2></div><span class="quick-spark">ϟ</span></div>
+        <button class="quick-action" data-scroll="pembelian"><span class="action-icon green">＋</span><span><b>Pembelian baru</b><small>Tambah stok dari supplier</small></span><span class="arrow">›</span></button>
+        <button class="quick-action warm" data-scroll="persediaan"><span class="action-icon orange">▦</span><span><b>Lihat persediaan</b><small>Periksa layer FIFO aktif</small></span><span class="arrow">›</span></button>
+        <button class="quick-action blue" data-scroll="produk"><span class="action-icon blue-icon">◇</span><span><b>Produk baru</b><small>Buat menu cafe sederhana</small></span><span class="arrow">›</span></button>
+      </div>
+    </section>
+
+    <section class="metric-grid" aria-label="Ringkasan metrik">
+      <article class="metric metric-green"><span class="metric-icon">◇</span><div><span class="metric-label">Nilai persediaan</span><strong id="inventoryValue">Rp 0</strong><small class="metric-trend">▲ Terbarui hari ini</small></div></article>
+      <article class="metric metric-orange"><span class="metric-icon">▣</span><div><span class="metric-label">Bahan perlu perhatian</span><strong id="lowStockCount">0</strong><small>Di bawah batas minimum</small></div><span class="metric-corner">!</span></article>
+      <article class="metric metric-blue"><span class="metric-icon">▤</span><div><span class="metric-label">Pembelian bulan ini</span><strong id="purchaseTotal">Rp 0</strong><small id="purchaseCount">0 transaksi tercatat</small></div><span class="metric-bars">▂▅▇</span></article>
+      <article class="metric metric-leaf"><span class="metric-icon">▣</span><div><span class="metric-label">Status buku</span><strong>Seimbang <span class="check-mark">✓</span></strong><small>Jurnal aktif</small></div></article>
+    </section>
+
+    <section class="dashboard-lower-grid">
+      <section id="persediaan" class="inventory-panel">
+        <div class="section-heading panel-heading"><div class="heading-with-icon"><span class="section-icon">◇</span><span><h2>Persediaan Bahan Baku</h2><small>Stok terbaru dan pergerakan bahan baku</small></span></div><button class="text-button" data-scroll="persediaan">Lihat semua <span>→</span></button></div>
+        <div class="table-wrap"><table><thead><tr><th>No</th><th>Nama bahan</th><th>Stok tersedia</th><th>Minimum</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="materialsBody"><tr><td colspan="6" class="empty">Memuat data persediaan...</td></tr></tbody></table></div>
+        <button class="outline-button refresh-button" id="refreshButton">↻ Perbarui data</button>
+      </section>
+      <section class="activity-panel" id="jurnal">
+        <div class="section-heading panel-heading"><div class="heading-with-icon"><span class="section-icon activity-icon">◷</span><span><h2>Aktivitas Terbaru</h2><small>Catatan kegiatan operasional</small></span></div><a class="text-button" href="#jurnal">Lihat semua <span>→</span></a></div>
+        <div id="activityList" class="activity-list"><div class="empty">Memuat aktivitas...</div></div>
+      </section>
+    </section>
+
+    <section id="pembelian" class="content-section workflow-section">
+      <div class="section-heading"><div><p class="eyebrow">Input transaksi</p><h2>Pembelian baru</h2></div></div>
+      <div class="workflow-grid"><div class="panel"><form id="purchaseForm"><label>Supplier<select id="supplierId" required><option value="">Pilih supplier</option></select></label><label>Bahan baku<select id="materialId" required><option value="">Pilih bahan</option></select></label><div class="form-row"><label>Jumlah<input id="quantity" type="number" min="0.01" step="0.01" placeholder="0" required></label><label>Harga satuan<input id="unitCost" type="number" min="0" step="100" placeholder="0" required></label></div><label>Tanggal pembelian<input id="purchaseDate" type="date" required></label><button class="primary-button" type="submit">Simpan pembelian <span>→</span></button><p id="formMessage" class="form-message" role="status"></p></form></div></div>
+    </section>
+
+    <section class="content-section workflow-section" id="produk">
+      <div class="section-heading"><div><p class="eyebrow">Produk</p><h2>Menu cafe</h2></div></div>
+      <div class="workflow-grid product-grid"><div class="panel"><form id="productForm"><label>Nama produk<input id="productName" type="text" placeholder="Contoh: Kopi Latte" required></label><label>Kategori<select id="productCategory"><option value="minuman">Minuman</option><option value="food">Food</option><option value="snack">Snack</option></select></label><label>Harga jual<input id="productPrice" type="number" min="0" step="100" placeholder="25000" required></label><label>Recipe<input type="hidden" id="productRecipe" value="[]"><div id="recipeContainer"></div><button type="button" id="addRecipeRow" class="secondary-button">+ Tambah bahan</button></label><button class="primary-button" type="submit">Simpan produk <span>→</span></button><p id="productMessage" class="form-message" role="status"></p></form></div><div class="panel product-list-panel"><div class="section-heading"><div><p class="eyebrow">Daftar</p><h2>Produk aktif</h2></div></div><div class="table-wrap"><table><thead><tr><th>Produk</th><th>Kategori</th><th>Harga</th><th>Recipe</th></tr></thead><tbody id="productsBody"><tr><td colspan="4" class="empty">Belum ada produk.</td></tr></tbody></table></div></div></div>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
